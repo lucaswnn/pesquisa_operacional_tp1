@@ -55,7 +55,7 @@ end
 # Resolve o modelo
 optimize!(model)
 
-solucao = round(Int, value(sum(y[i] for i = 1:data.n)))
+solucao = round(Int, objective_value(model))
 
 # Exibe os resultados
 println("TP1 2022431302 = $solucao")
