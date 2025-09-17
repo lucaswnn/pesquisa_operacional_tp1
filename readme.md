@@ -1,0 +1,1 @@
+# Trabalho Prático 1 de Pesquisa Operacional 2025/02
