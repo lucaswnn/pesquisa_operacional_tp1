@@ -1,5 +1,5 @@
 using JuMP
-using HiGHS
+using Gurobi
 
 mutable struct ProblemData
     n::Int
@@ -54,7 +54,7 @@ file = open(ARGS[1], "r")
 data = readData(file)
 
 # Cria o modelo
-model = Model(HiGHS.Optimizer)
+model = Model(Gurobi.Optimizer)
 
 # xi: quantidade produzida no período i
 @variable(model, x[i=1:data.n] >= 0)

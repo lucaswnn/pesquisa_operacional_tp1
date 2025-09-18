@@ -1,5 +1,5 @@
 using JuMP
-using HiGHS
+using Gurobi
 
 mutable struct ProblemData
     n::Int
@@ -29,7 +29,7 @@ file = open(ARGS[1], "r")
 data = readData(file)
 
 # Cria o modelo
-model = Model(HiGHS.Optimizer)
+model = Model(Gurobi.Optimizer)
 
 # xij = 1 se o objeto i for empacotado na caixa j
 @variable(model, x[i=1:data.n, j=1:data.n], Bin)

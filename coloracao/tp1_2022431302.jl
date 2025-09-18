@@ -29,20 +29,26 @@ data = readData(file)
 # Cria o modelo
 model = Model(Gurobi.Optimizer)
 
-# xi = 1 se o vértice i faz parte da clique
-@variable(model, x[i=1:data.n], Bin)
+# xij = 1 se o vértice i recebe a cor j
+@variable(model, x[i=1:data.n, j=1:data.n], Bin)
 
-# vértices não conectados não podem estar na mesma clique
+# yi = 1 se a cor i é usada
+@variable(model, y[i=1:data.n], Bin)
+
+# vértices só podem ter uma cor
 for i in 1:data.n
-    for j in 1:data.n
-        if i != j && !((i, j) in data.arestas || (j, i) in data.arestas)
-            @constraint(model, x[i] + x[j] <= 1)
-        end
+    @constraint(model, sum(x[i, j] for j = 1:data.n) == 1)
+end
+
+# vértices conectados não podem ter a mesma cor
+for k in 1:data.n
+    for (u, v) in data.arestas
+        @constraint(model, x[u, k] + x[v, k] <= y[k])
     end
 end
 
-# Função objetivo: maximizar o tamanho da clique
-@objective(model, Max, sum(x[i] for i = 1:data.n))
+# Função objetivo: minimizar o número de cores usadas
+@objective(model, Min, sum(y[i] for i = 1:data.n))
 
 # Resolve o modelo
 optimize!(model)
