@@ -30,6 +30,7 @@ data = readData(file)
 
 # Cria o modelo
 model = Model(Gurobi.Optimizer)
+set_attribute(model, "OutputFlag", 0)
 
 # xij = 1 se o objeto i for empacotado na caixa j
 @variable(model, x[i=1:data.n, j=1:data.n], Bin)

@@ -28,6 +28,7 @@ data = readData(file)
 
 # Cria o modelo
 model = Model(Gurobi.Optimizer)
+set_attribute(model, "OutputFlag", 0)
 
 # xi = 1 se o vértice i faz parte da clique
 @variable(model, x[i=1:data.n], Bin)

@@ -28,25 +28,26 @@ data = readData(file)
 
 # Cria o modelo
 model = Model(Gurobi.Optimizer)
+set_attribute(model, "OutputFlag", 0)
 
-# xij = 1 se o vértice i recebe a cor j
-@variable(model, x[i=1:data.n, j=1:data.n], Bin)
+# xic = 1 se o vértice i recebe a cor c
+@variable(model, x[i=1:data.n, c=1:data.n], Bin)
 
-# yi = 1 se a cor i é usada
-@variable(model, y[i=1:data.n], Bin)
+# yc = 1 se a cor c é usada
+@variable(model, y[c=1:data.n], Bin)
 
-# zij = 1 se a cor i tem vizinho com a cor j
-@variable(model, z[i=1:data.n, j=1:data.n], Bin)
+# zc1c2 = 1 se os vértices com a cor c1 tem vizinho com a cor c2
+@variable(model, z[c1=1:data.n, c2=1:data.n], Bin)
 
 # vértices só podem ter uma cor
 for i in 1:data.n
-    @constraint(model, sum(x[i, j] for j = 1:data.n) == 1)
+    @constraint(model, sum(x[i, c] for c = 1:data.n) == 1)
 end
 
 # vértices conectados não podem ter a mesma cor
-for k in 1:data.n
+for c in 1:data.n
     for (u,v) in data.arestas
-        @constraint(model, x[u, k] + x[v, k] <= y[k])
+        @constraint(model, x[u, c] + x[v, c] <= y[c])
     end
 end
 
@@ -62,9 +63,20 @@ for c1 in 1:data.n
     end
 end
 
+# verifica se nenhum vértice com cor i tem como vizinho a cor j
+for c1 in 1:data.n
+    for c2 in 1:data.n
+        @constraint(model, z[c1,c2] <= sum(1 - (x[u,c1] - x[v,c2]) for (u,v) in data.arestas))
+    end
+end
+
 # cor i possui todos vizinhos com cor j
-for i in 1:data.n
-    @constraint(model, sum(z[i,j] for j=1:data.n if j != i) == sum(y[j] for j=1:data.n if j != i))
+for c1 in 1:data.n
+    for c2 in 1:data.n
+        if c1 != c2
+            @constraint(model, z[c1,c2] >= y[c1] + y[c2] - 1)
+        end
+    end
 end
 
 # Função objetivo: minimizar o número de cores usadas
@@ -77,15 +89,3 @@ solucao = round(Int, objective_value(model))
 
 # Exibe os resultados
 println("TP1 2022431302 = $solucao")
-
-function printSolution(model, n)
-    for i in 1:n
-        for j in 1:n
-            if value(model[:x][i,j]) > 0.5
-                print("Vértice $i -> Cor $j\n")
-            end
-        end
-    end
-end
-
-printSolution(model, data.n)

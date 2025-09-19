@@ -55,6 +55,7 @@ data = readData(file)
 
 # Cria o modelo
 model = Model(Gurobi.Optimizer)
+set_attribute(model, "OutputFlag", 0)
 
 # xi: quantidade produzida no período i
 @variable(model, x[i=1:data.n] >= 0)
