@@ -1,0 +1,4 @@
+3.0 CORES
+COR 1 : 1  4 
+COR 2 : 2 
+COR 3 : 3  5 
