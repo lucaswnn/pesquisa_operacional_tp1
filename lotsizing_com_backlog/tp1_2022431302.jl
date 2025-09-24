@@ -66,7 +66,7 @@ set_attribute(model, "OutputFlag", 0)
 # ki: quantidade de produtos atrasados antes do período i
 @variable(model, k[i=0:data.n] >= 0)
 
-# vértices não conectados não podem estar na mesma clique
+# balanço
 for i in 1:data.n
     @constraint(model, s[i-1] + x[i] + k[i] - k[i-1] - data.demandas[i] == s[i])
 end
